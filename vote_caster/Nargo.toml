@@ -1,5 +1,5 @@
 [package]
-name = "vote_prover"
+name = "vote_caster"
 type = "bin"
 authors = ["Alessandro Manfredi @substancelabs"]
 
