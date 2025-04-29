@@ -1,0 +1,6 @@
+[package]
+name = "vote_prover"
+type = "bin"
+authors = ["Alessandro Manfredi @substancelabs"]
+
+[dependencies]
