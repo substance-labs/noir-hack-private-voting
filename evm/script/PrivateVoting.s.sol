@@ -5,14 +5,14 @@ import {Script, console} from "forge-std/Script.sol";
 import {PrivateVoting} from "../src/PrivateVoting.sol";
 
 contract PrivateVotingScript is Script {
-    PrivateVoting public counter;
+    PrivateVoting public privateVoting;
 
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        counter = new PrivateVoting();
+        // privateVoting = new PrivateVoting();
 
         vm.stopBroadcast();
     }

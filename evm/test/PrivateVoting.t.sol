@@ -8,6 +8,6 @@ contract PrivateVotingTest is Test {
     PrivateVoting public privateVoting;
 
     function setUp() public {
-        privateVoting = new PrivateVoting();
+        // privateVoting = new PrivateVoting();
     }
 }
