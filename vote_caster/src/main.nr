@@ -8,22 +8,19 @@ fn main(
     pub_key: Field,
     pub_key_hash: pub Field,
     vote: Field,
-    cyp_vote: Field,
     vote_randomness: Field,
-    current_vote_sum: pub Field,
-    current_vote_sum_randomness: pub Field,
-    cyp_new_vote_sum: pub Field,
-    new_vote_sum_randomness: pub Field,
+    current_c1: pub Field,
+    current_c2: pub Field,
+    new_c1: pub Field,
+    new_c2: pub Field,
 ) {
     assert(vote as u64 <= 1); // a vote can be 0 or 1
-    assert(vote_randomness + current_vote_sum_randomness == new_vote_sum_randomness);
 
     let (d1, d2) = encrypt(gen, pub_key, vote, vote_randomness);
-    let (e1, e2) = encrypt(gen, pub_key, current_vote_sum, current_vote_sum_randomness);
-    let (added1, added2) = aggregate(d1, d2, e1, e2);
+    let (added1, added2) = aggregate(d1, d2, current_c1, current_c2);
 
-    assert(added1 == cyp_vote);
-    assert(added2 == cyp_new_vote_sum);
+    assert(added1 == new_c1);
+    assert(added2 == new_c2);
     assert(Poseidon2::hash([pub_key], 1) == pub_key_hash);
 }
 
@@ -37,23 +34,22 @@ fn test_main() {
     let vote = 1;
     let vote_randomness = 200;
 
-    let current_vote_sum = 1;
-    let current_vote_sum_randomness = 100;
+    let initial_vote_sum = 0;
+    let initial_vote_randomness = 0;
+    let (current_c1, current_c2) = encrypt(gen, pub_key, initial_vote_sum, initial_vote_randomness);
 
-    let combined_msg = vote + current_vote_sum;
-    let new_vote_sum_randomness = vote_randomness + current_vote_sum_randomness;
-    let (cyp_vote, cyp_new_vote_sum) = encrypt(gen, pub_key, combined_msg, new_vote_sum_randomness);
+    let (d1, d2) = encrypt(gen, pub_key, vote, vote_randomness);
+    let (new_c1, new_c2) = aggregate(d1, d2, current_c1, current_c2);
 
     std::println(gen);
     std::println(pub_key);
     std::println(pub_key_hash);
-    std::println(vote_randomness);
     std::println(vote);
-    std::println(current_vote_sum_randomness);
-    std::println(current_vote_sum);
-    std::println(cyp_vote);
-    std::println(cyp_new_vote_sum);
-    std::println(new_vote_sum_randomness);
+    std::println(vote_randomness);
+    std::println(current_c1);
+    std::println(current_c2);
+    std::println(new_c1);
+    std::println(new_c2);
 
     // TODO: handle concurrency.
     main(
@@ -61,11 +57,10 @@ fn test_main() {
         pub_key,
         pub_key_hash,
         vote,
-        cyp_vote,
         vote_randomness,
-        current_vote_sum,
-        current_vote_sum_randomness,
-        cyp_new_vote_sum,
-        new_vote_sum_randomness,
+        current_c1,
+        current_c2,
+        new_c1,
+        new_c2,
     );
 }

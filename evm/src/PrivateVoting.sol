@@ -22,9 +22,7 @@ contract PrivateVoting is IPrivateVoting, Ownable {
     }
 
     /// @inheritdoc IPrivateVoting
-    function castVote(uint256 voteId, bytes32 cypNewVotesSum, bytes32 newVoteRandomness, bytes calldata proof)
-        external
-    {
+    function castVote(uint256 voteId, bytes32 c1, bytes32 c2, bytes calldata proof) external {
         // TODO: handle better double voting when zkpassport will be integrated
         /*bytes32 voterId = bytes32(0); // TODO
         require(!_castedVotes[voteId][voterId]);
@@ -36,14 +34,14 @@ contract PrivateVoting is IPrivateVoting, Ownable {
         bytes32[] memory publicInputs = new bytes32[](6);
         publicInputs[0] = GENERATOR;
         publicInputs[1] = PUBLIC_KEY_HASH;
-        publicInputs[2] = vote.randomness; // current randomness
-        publicInputs[3] = vote.cypSum; // current encrypted sum
-        publicInputs[4] = cypNewVotesSum; // new encrypted sum
-        publicInputs[5] = newVoteRandomness; // new randomness
+        publicInputs[2] = vote.c1;
+        publicInputs[3] = vote.c2;
+        publicInputs[4] = c1;
+        publicInputs[5] = c2;
         require(VERIFIER.verify(proof, publicInputs), InvalidProof());
 
-        vote.cypSum = cypNewVotesSum;
-        vote.randomness = newVoteRandomness;
+        vote.c1 = c1;
+        vote.c2 = c2;
         numberOfVotes += 1;
         // ...
 
