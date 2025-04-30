@@ -1,5 +1,3 @@
-mod elgamal;
-
 use elgamal::{aggregate, decrypt, discrete_log, encrypt};
 use std::hash::poseidon2::Poseidon2;
 
