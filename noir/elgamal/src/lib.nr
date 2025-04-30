@@ -26,3 +26,8 @@ pub fn encrypt(gen: Field, pub_key: Field, m: Field, r: Field) -> (Field, Field)
 pub fn aggregate(c1_1: Field, c2_1: Field, c1_2: Field, c2_2: Field) -> (Field, Field) {
     (c1_1 * c1_2, c2_1 * c2_2)
 }
+
+pub fn verify_discrete_log(g: Field, log_value: Field, expected: Field) {
+    let computed = g.pow_32(log_value);
+    assert(computed == expected);
+}
