@@ -12,7 +12,7 @@ fn main(
     new_c1: pub Field,
     new_c2: pub Field,
 ) {
-    assert(vote as u64 <= 1); // a vote can be 0 or 1
+    assert(vote * (vote - 1) == 0); // a vote can be 0 or 1
 
     let (d1, d2) = encrypt(g, pub_key, vote, vote_randomness);
     let (added1, added2) = aggregate(d1, d2, current_c1, current_c2);
