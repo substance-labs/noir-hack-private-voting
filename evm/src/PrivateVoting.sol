@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {IVerifier} from "./Verifier.sol";
+import {IVerifier} from "./interfaces/IVerifier.sol";
 import {IPrivateVoting} from "./interfaces/IPrivateVoting.sol";
 
 contract PrivateVoting is IPrivateVoting, Ownable {
@@ -13,23 +13,28 @@ contract PrivateVoting is IPrivateVoting, Ownable {
 
     bytes32 public immutable PUBLIC_KEY_HASH;
     bytes32 public immutable GENERATOR;
-    IVerifier public immutable VERIFIER;
+    IVerifier public immutable CAST_VOTE_VERIFIER;
+    IVerifier public immutable REVEAL_VOTE_VERIFIER;
 
-    constructor(bytes32 publicKeyHash, bytes32 generator, address verifier) Ownable(msg.sender) {
+    constructor(bytes32 publicKeyHash, bytes32 generator, address castVoteVerifier, address revealVoteVerifier)
+        Ownable(msg.sender)
+    {
         PUBLIC_KEY_HASH = publicKeyHash;
         GENERATOR = generator;
-        VERIFIER = IVerifier(verifier);
+        CAST_VOTE_VERIFIER = IVerifier(castVoteVerifier);
+        REVEAL_VOTE_VERIFIER = IVerifier(revealVoteVerifier);
     }
 
     /// @inheritdoc IPrivateVoting
     function castVote(uint256 voteId, bytes32 c1, bytes32 c2, bytes calldata proof) external {
+        Vote storage vote = _votes[voteId];
+        require(vote.state == VoteState.Created, InvalidVoteState());
+        require(vote.endBlock > block.number, VoteStillActive());
+
         // TODO: handle better double voting when zkpassport will be integrated
         /*bytes32 voterId = bytes32(0); // TODO
         require(!_castedVotes[voteId][voterId]);
         _castedVotes[voteId][voterId] = true;*/
-
-        Vote storage vote = _votes[voteId];
-        if (vote.endBlock == 0) revert VoteDoesNotExist();
 
         bytes32[] memory publicInputs = new bytes32[](6);
         publicInputs[0] = GENERATOR;
@@ -38,7 +43,7 @@ contract PrivateVoting is IPrivateVoting, Ownable {
         publicInputs[3] = vote.c2;
         publicInputs[4] = c1;
         publicInputs[5] = c2;
-        require(VERIFIER.verify(proof, publicInputs), InvalidProof());
+        require(CAST_VOTE_VERIFIER.verify(proof, publicInputs), InvalidProof());
 
         vote.c1 = c1;
         vote.c2 = c2;
@@ -62,13 +67,32 @@ contract PrivateVoting is IPrivateVoting, Ownable {
     }
 
     /// @inheritdoc IPrivateVoting
+    function revealVote(uint256 voteId, uint256 decryptedSum, bytes calldata proof) external {
+        Vote memory vote = _getVote(voteId);
+        require(vote.endBlock <= block.number, VoteStillActive());
+        require(vote.state == VoteState.Created, InvalidVoteState());
+
+        bytes32[] memory publicInputs = new bytes32[](4);
+        publicInputs[0] = GENERATOR;
+        publicInputs[2] = vote.c1;
+        publicInputs[3] = vote.c2;
+        publicInputs[4] = bytes32(decryptedSum);
+        require(REVEAL_VOTE_VERIFIER.verify(proof, publicInputs), InvalidProof());
+
+        vote.state = VoteState.Revealed;
+        vote.result = decryptedSum;
+
+        emit VoteRevealed(voteId);
+    }
+
+    /// @inheritdoc IPrivateVoting
     function hasVoted(uint256 voteId, bytes32 voterId) external view returns (bool) {
         return _castedVotes[voteId][voterId];
     }
 
     function _getVote(uint256 voteId) internal view returns (Vote storage) {
         Vote storage vote = _votes[voteId];
-        if (vote.endBlock == 0) revert VoteDoesNotExist();
+        require(vote.endBlock != 0, VoteDoesNotExist());
         return vote;
     }
 }

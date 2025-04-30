@@ -6,7 +6,6 @@ interface IPrivateVoting {
     enum VoteState {
         NotCreated,
         Created,
-        RequestedToReveal,
         Revealed
     }
 
@@ -22,9 +21,12 @@ interface IPrivateVoting {
 
     event VoteCasted(uint256 indexed voteId);
     event VoteCreated(uint256 indexed voteId);
+    event VoteRevealed(uint256 indexed voteId);
 
     error InvalidProof();
+    error InvalidVoteState();
     error VoteDoesNotExist();
+    error VoteStillActive();
 
     function castVote(uint256 voteId, bytes32 c1, bytes32 c2, bytes calldata proof) external;
 
@@ -33,4 +35,6 @@ interface IPrivateVoting {
     function getVote(uint256 voteId) external view returns (Vote memory);
 
     function hasVoted(uint256 voteId, bytes32 voterId) external view returns (bool);
+
+    function revealVote(uint256 voteId, uint256 decryptedSum, bytes calldata proof) external;
 }
