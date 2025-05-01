@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "prettier:write": "prettier --write \"**/provers/*.{json,js}\""
+  },
+  "type": "module",
+  "dependencies": {
+    "@aztec/bb.js": "0.82.2",
+    "@noir-lang/noir_js": "1.0.0-beta.3",
+    "big-integer": "^1.6.52",
+    "viem": "^2.28.1"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3"
+  }
+}
