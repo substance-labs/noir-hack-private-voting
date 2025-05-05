@@ -4,21 +4,17 @@ pragma solidity ^0.8.28;
 import {Test, console} from "forge-std/Test.sol";
 import {PrivateVoting} from "../src/PrivateVoting.sol";
 import {CastVoteVerifier} from "../src/verifiers/CastVoteVerifier.sol";
-import {RevealVoteVerifier} from "../src/verifiers/RevealVoteVerifier.sol";
 
 contract PrivateVotingTest is Test {
     PrivateVoting public privateVoting;
     CastVoteVerifier public castVoteVerifier;
-    RevealVoteVerifier public revealVoteVerifier;
 
     function setUp() public {
         castVoteVerifier = new CastVoteVerifier();
-        revealVoteVerifier = new RevealVoteVerifier();
 
         bytes32 publicKeyHash = 0x22f162a4e96080597d7c32dffe2d6beee811fe65cbf4774850fd51d41550ca7e;
         bytes32 generator = bytes32(uint256(2));
-        privateVoting =
-            new PrivateVoting(publicKeyHash, generator, address(castVoteVerifier), address(revealVoteVerifier));
+        privateVoting = new PrivateVoting(publicKeyHash, generator, address(castVoteVerifier));
     }
 
     function test_cast_vote() public {

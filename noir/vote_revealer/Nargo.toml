@@ -1,7 +1,0 @@
-[package]
-name = "vote_revealer"
-type = "bin"
-authors = ["Alessandro Manfredi @substancelabs"]
-
-[dependencies]
-elgamal = { path = "../elgamal" }

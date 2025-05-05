@@ -36,5 +36,5 @@ interface IPrivateVoting {
 
     function hasVoted(uint256 voteId, bytes32 voterId) external view returns (bool);
 
-    function revealVote(uint256 voteId, uint256 decryptedSum, bytes calldata proof) external;
+    function revealVote(uint256 voteId) external;
 }

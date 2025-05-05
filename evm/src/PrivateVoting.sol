@@ -14,15 +14,11 @@ contract PrivateVoting is IPrivateVoting, Ownable {
     bytes32 public immutable PUBLIC_KEY_HASH;
     bytes32 public immutable GENERATOR;
     IVerifier public immutable CAST_VOTE_VERIFIER;
-    IVerifier public immutable REVEAL_VOTE_VERIFIER;
 
-    constructor(bytes32 publicKeyHash, bytes32 generator, address castVoteVerifier, address revealVoteVerifier)
-        Ownable(msg.sender)
-    {
+    constructor(bytes32 publicKeyHash, bytes32 generator, address castVoteVerifier) Ownable(msg.sender) {
         PUBLIC_KEY_HASH = publicKeyHash;
         GENERATOR = generator;
         CAST_VOTE_VERIFIER = IVerifier(castVoteVerifier);
-        REVEAL_VOTE_VERIFIER = IVerifier(revealVoteVerifier);
     }
 
     /// @inheritdoc IPrivateVoting
@@ -72,21 +68,8 @@ contract PrivateVoting is IPrivateVoting, Ownable {
     }
 
     /// @inheritdoc IPrivateVoting
-    function revealVote(uint256 voteId, uint256 decryptedSum, bytes calldata proof) external {
-        Vote memory vote = _getVote(voteId);
-        require(vote.endBlock <= block.number, VoteStillActive());
-        require(vote.state == VoteState.Created, InvalidVoteState());
-
-        bytes32[] memory publicInputs = new bytes32[](4);
-        publicInputs[0] = GENERATOR;
-        publicInputs[2] = vote.c1;
-        publicInputs[3] = vote.c2;
-        publicInputs[4] = bytes32(decryptedSum);
-        require(REVEAL_VOTE_VERIFIER.verify(proof, publicInputs), InvalidProof());
-
-        vote.state = VoteState.Revealed;
-        vote.result = decryptedSum;
-
+    function revealVote(uint256 voteId) external {
+        // TODO
         emit VoteRevealed(voteId);
     }
 
