@@ -1,6 +1,6 @@
 pub fn decrypt(priv_key: Field, c1: Field, c2: Field) -> Field {
     let shared_secret = c1.pow_32(priv_key);
-    let shared_secret_inv = 1 / shared_secret; // Inverso moltiplicativo
+    let shared_secret_inv = 1 / shared_secret;
     let plaintext = c2 * shared_secret_inv;
     plaintext
 }
