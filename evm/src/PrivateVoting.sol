@@ -32,10 +32,6 @@ contract PrivateVoting is IPrivateVoting, Ownable {
         require(!_castedVotes[voteId][voterId]);
         _castedVotes[voteId][voterId] = true;*/
 
-        // How can i be sure that the user that casted the vote really wanted to vote in favour or not?
-        // link between zkpassport proof and vote caster proof
-        // the vote caster proof should also include the verification of the key linked to the passport
-
         bytes32[] memory publicInputs = new bytes32[](6);
         publicInputs[0] = GENERATOR;
         publicInputs[1] = PUBLIC_KEY_HASH;
