@@ -43,7 +43,6 @@ contract PrivateVoting is IPrivateVoting, Ownable {
         (uint256 newC1, uint256 newC2) = Elgamal.aggregate(vote.c1, vote.c2, c1, c2);
         vote.c1 = newC1;
         vote.c2 = newC2;
-        numberOfVotes += 1;
         // ...
 
         emit VoteCasted(voteId);
