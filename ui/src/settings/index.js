@@ -1,6 +1,6 @@
 export default {
   addresses: {
-    privateVoting: "0xa8269cf54Af537Ea74dC0FE5bb94dAfBea1588f0",
+    privateVoting: "0x75D0417F6e5490C4003575CB786c10863303E859",
   },
   apiUrl: "http://localhost:3000",
 }

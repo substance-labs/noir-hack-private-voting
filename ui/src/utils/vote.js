@@ -2,8 +2,6 @@ import { UltraHonkBackend } from "@aztec/bb.js"
 import { Noir } from "@noir-lang/noir_js"
 import bigInt from "big-integer"
 import { ZKPassport } from "@zkpassport/sdk"
-import { createPublicClient, http } from "viem"
-import { sepolia } from "viem/chains"
 
 import { encrypt } from "./elgamal.js"
 import circuitJson from "./artifacts/vote-caster.json"
@@ -12,7 +10,6 @@ import initNoirC from "@noir-lang/noirc_abi"
 import initACVM from "@noir-lang/acvm_js"
 import acvm from "@noir-lang/acvm_js/web/acvm_js_bg.wasm?url"
 import noirc from "@noir-lang/noirc_abi/web/noirc_abi_wasm_bg.wasm?url"
-import settings from "../settings/index.js"
 await Promise.all([initACVM(fetch(acvm)), initNoirC(fetch(noirc))])
 
 export const getZkPassportProof = async ({ voteId, onUrl, onRequestReceived: _onRequestReceived }) => {
@@ -68,10 +65,6 @@ export const getCastVoteProof = async ({ vote }) => {
   const noir = new Noir(circuitJson)
   const backend = new UltraHonkBackend(circuitJson.bytecode, {
     threads: navigator.hardwareConcurrency,
-  })
-  const publicClient = createPublicClient({
-    chain: sepolia,
-    transport: http(settings.rpc),
   })
 
   const g = "0x02" // TODO
