@@ -24,8 +24,6 @@ contract PrivateVotingTest is Test {
         privateVoting.createVote(endBlock, minQuorum, description);
 
         uint256 voteId = 0;
-        PrivateVoting.Vote memory vote = privateVoting.getVote(voteId);
-
         uint256 intention = 1; // this is a private input
         uint256 voteRandomness = block.number; // this is a private input
 
@@ -42,15 +40,11 @@ contract PrivateVotingTest is Test {
             " ",
             iToHex(abi.encodePacked(intention)),
             " ",
-            iToHex(abi.encodePacked(voteRandomness)),
-            " ",
-            iToHex(abi.encodePacked(vote.c1)),
-            " ",
-            iToHex(abi.encodePacked(vote.c2))
+            iToHex(abi.encodePacked(voteRandomness))
         );
 
         bytes memory result = vm.ffi(inputs);
-        (bytes32 c1, bytes32 c2, bytes memory proof) = abi.decode(result, (bytes32, bytes32, bytes));
+        (uint256 c1, uint256 c2, bytes memory proof) = abi.decode(result, (uint256, uint256, bytes));
         privateVoting.castVote(voteId, c1, c2, proof);
     }
 

@@ -2,6 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Elgamal} from "./libraries/Elgamal.sol";
 import {IVerifier} from "./interfaces/IVerifier.sol";
 import {IPrivateVoting} from "./interfaces/IPrivateVoting.sol";
 
@@ -22,7 +23,7 @@ contract PrivateVoting is IPrivateVoting, Ownable {
     }
 
     /// @inheritdoc IPrivateVoting
-    function castVote(uint256 voteId, bytes32 c1, bytes32 c2, bytes calldata proof) external {
+    function castVote(uint256 voteId, uint256 c1, uint256 c2, bytes calldata proof) external {
         Vote storage vote = _votes[voteId];
         require(vote.state == VoteState.Created, InvalidVoteState());
         require(vote.endBlock > block.number, VoteStillActive());
@@ -32,17 +33,16 @@ contract PrivateVoting is IPrivateVoting, Ownable {
         require(!_castedVotes[voteId][voterId]);
         _castedVotes[voteId][voterId] = true;*/
 
-        bytes32[] memory publicInputs = new bytes32[](6);
+        bytes32[] memory publicInputs = new bytes32[](4);
         publicInputs[0] = GENERATOR;
         publicInputs[1] = PUBLIC_KEY_HASH;
-        publicInputs[2] = vote.c1;
-        publicInputs[3] = vote.c2;
-        publicInputs[4] = c1;
-        publicInputs[5] = c2;
+        publicInputs[2] = bytes32(c1);
+        publicInputs[3] = bytes32(c2);
         require(CAST_VOTE_VERIFIER.verify(proof, publicInputs), InvalidProof());
 
-        vote.c1 = c1;
-        vote.c2 = c2;
+        (uint256 newC1, uint256 newC2) = Elgamal.aggregate(vote.c1, vote.c2, c1, c2);
+        vote.c1 = newC1;
+        vote.c2 = newC2;
         numberOfVotes += 1;
         // ...
 
@@ -52,8 +52,7 @@ contract PrivateVoting is IPrivateVoting, Ownable {
     /// @inheritdoc IPrivateVoting
     function createVote(uint256 endBlock, uint256 minQuorum, string calldata description) external onlyOwner {
         uint256 voteId = numberOfVotes;
-        _votes[voteId] =
-            Vote(endBlock, minQuorum, bytes32(uint256(1)), bytes32(uint256(1)), 0, description, VoteState.Created);
+        _votes[voteId] = Vote(endBlock, minQuorum, 1, 1, 0, description, VoteState.Created);
         numberOfVotes++;
         emit VoteCreated(voteId);
     }

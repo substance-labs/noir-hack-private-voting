@@ -12,8 +12,8 @@ interface IPrivateVoting {
     struct Vote {
         uint256 endBlock;
         uint256 minQuorum;
-        bytes32 c1;
-        bytes32 c2;
+        uint256 c1;
+        uint256 c2;
         uint256 result;
         string description;
         VoteState state;
@@ -28,7 +28,7 @@ interface IPrivateVoting {
     error VoteDoesNotExist();
     error VoteStillActive();
 
-    function castVote(uint256 voteId, bytes32 c1, bytes32 c2, bytes calldata proof) external;
+    function castVote(uint256 voteId, uint256 c1, uint256 c2, bytes calldata proof) external;
 
     function createVote(uint256 endBlock, uint256 minQuorum, string calldata description) external;
 
