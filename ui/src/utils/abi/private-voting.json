@@ -70,13 +70,13 @@
       },
       {
         "name": "c1",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "type": "uint256",
+        "internalType": "uint256"
       },
       {
         "name": "c2",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "type": "uint256",
+        "internalType": "uint256"
       },
       {
         "name": "proof",
@@ -138,13 +138,13 @@
           },
           {
             "name": "c1",
-            "type": "bytes32",
-            "internalType": "bytes32"
+            "type": "uint256",
+            "internalType": "uint256"
           },
           {
             "name": "c2",
-            "type": "bytes32",
-            "internalType": "bytes32"
+            "type": "uint256",
+            "internalType": "uint256"
           },
           {
             "name": "result",

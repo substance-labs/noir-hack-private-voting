@@ -1,6 +1,6 @@
 export default {
   addresses: {
-    privateVoting: "0xc7199817eEDb926737d683b9302EA0f1cA0E18e9",
+    privateVoting: "0xa8269cf54Af537Ea74dC0FE5bb94dAfBea1588f0",
   },
-  rpc: "https://sepolia.gateway.tenderly.co",
+  apiUrl: "http://localhost:3000",
 }

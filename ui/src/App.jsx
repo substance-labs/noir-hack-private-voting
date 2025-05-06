@@ -1,8 +1,10 @@
 import React, { useCallback, useState } from "react"
 import QRCode from "react-qr-code"
 import { Slide, ToastContainer } from "react-toastify"
-import { X } from "lucide-react"
+
 import { getCastVoteProof, getZkPassportProof } from "./utils/vote"
+import settings from "./settings"
+
 import Modal from "./components/Modal"
 
 const App = () => {
@@ -12,9 +14,10 @@ const App = () => {
 
   const onVote = useCallback(async () => {
     try {
+      const voteId = 0
       const [zkPassportProof, castVoteProof] = await Promise.all([
         getZkPassportProof({
-          voteId: 0,
+          voteId,
           onUrl: (url) => setUrl(url),
           onRequestReceived: () => {
             setUrl(null)
@@ -23,11 +26,24 @@ const App = () => {
         }),
         getCastVoteProof({
           vote: vote === "yes" ? 1 : 0,
-          voteId: 0,
         }),
       ])
       console.log(zkPassportProof)
       console.log(castVoteProof)
+
+      const { publicInputs, proof } = castVoteProof
+      const c1 = publicInputs[2]
+      const c2 = publicInputs[3]
+
+      const { transactionHash } = await fetch(`${settings.apiUrl}/cast-vote`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ voteId, c1, c2, proof: "0x" + Buffer.from(proof).toString("hex") }),
+      }).then((res) => res.json())
+
+      console.log(transactionHash)
     } catch (err) {
       console.error(err)
     } finally {

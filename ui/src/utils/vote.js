@@ -5,8 +5,7 @@ import { ZKPassport } from "@zkpassport/sdk"
 import { createPublicClient, http } from "viem"
 import { sepolia } from "viem/chains"
 
-import { aggregate, encrypt } from "./elgamal.js"
-import privateVotingAbi from "./abi/private-voting.json"
+import { encrypt } from "./elgamal.js"
 import circuitJson from "./artifacts/vote-caster.json"
 
 import initNoirC from "@noir-lang/noirc_abi"
@@ -65,7 +64,7 @@ export const getZkPassportProof = async ({ voteId, onUrl, onRequestReceived: _on
   return Promise.race([Promise.all([, /*waitProofGenerated()*/ waitResult()]) /*, waitError()*/, waitReject()])
 }
 
-export const getCastVoteProof = async ({ vote, voteId }) => {
+export const getCastVoteProof = async ({ vote }) => {
   const noir = new Noir(circuitJson)
   const backend = new UltraHonkBackend(circuitJson.bytecode, {
     threads: navigator.hardwareConcurrency,
@@ -80,29 +79,15 @@ export const getCastVoteProof = async ({ vote, voteId }) => {
   const pubKeyHash = "0x22f162a4e96080597d7c32dffe2d6beee811fe65cbf4774850fd51d41550ca7e"
   const voteRandomness = "0x" + bigInt.randBetween(0, 1000000).toString(16) // TODO
 
-  const { c1: currentC1, c2: currentC2 } = await publicClient.readContract({
-    address: settings.addresses.privateVoting,
-    abi: privateVotingAbi,
-    functionName: "getVote",
-    args: [voteId],
-  })
-
-  const [d1, d2] = encrypt(bigInt(g), bigInt(pubKey), bigInt(vote), bigInt(voteRandomness))
-  const [newC1, newC2] = aggregate([
-    { c1: bigInt(currentC1), c2: bigInt(currentC2) },
-    { c1: d1, c2: d2 },
-  ])
-
+  const [c1, c2] = encrypt(bigInt(g), bigInt(pubKey), bigInt(vote), bigInt(voteRandomness))
   const { witness } = await noir.execute({
     g,
     vote,
     vote_randomness: voteRandomness,
     pub_key: pubKey,
     pub_key_hash: pubKeyHash,
-    current_c1: currentC1,
-    current_c2: currentC2,
-    new_c1: "0x" + newC1.toString(16),
-    new_c2: "0x" + newC2.toString(16),
+    expected_c1: "0x" + c1.toString(16),
+    expected_c2: "0x" + c2.toString(16),
   })
   return await backend.generateProof(witness, { keccak: true })
 }

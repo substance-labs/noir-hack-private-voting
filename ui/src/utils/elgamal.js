@@ -8,13 +8,3 @@ export const encrypt = (g, pubKey, m, r) => {
   const c2 = pubKey.modPow(r, p).multiply(g.modPow(m, p)).mod(p)
   return [c1, c2]
 }
-
-export const aggregate = (ciphertexts) => {
-  let c1Res = bigInt.one
-  let c2res = bigInt.one
-  for (const { c1, c2 } of ciphertexts) {
-    c1Res = c1Res.multiply(c1).mod(p)
-    c2res = c2res.multiply(c2).mod(p)
-  }
-  return [c1Res, c2res]
-}
