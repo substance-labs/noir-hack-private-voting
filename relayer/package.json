@@ -1,0 +1,29 @@
+{
+  "name": "relayer",
+  "version": "0.0.1",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint --ignore-path ./.eslintignore --ext .js,.ts .",
+    "prettier:check": "prettier --check \"**/*.{js,json,md,sol,ts,yml}\"",
+    "prettier:write": "prettier --write \"**/*.{js,json,md,sol,ts,yml}\""
+  },
+  "author": "Alessandro Manfredi",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "fastify": "^5.3.2",
+    "viem": "^2.28.4",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@typescript-eslint/eslint-plugin": "^8.26.1",
+    "@typescript-eslint/parser": "^8.26.1",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  }
+}
