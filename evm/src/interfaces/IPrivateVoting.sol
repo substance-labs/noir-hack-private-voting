@@ -12,10 +12,11 @@ interface IPrivateVoting {
     struct Vote {
         uint256 endBlock;
         uint256 minQuorum;
+        uint256 numberOfVotes;
         uint256 c1;
         uint256 c2;
         uint256 result;
-        string description;
+        string ref;
         VoteState state;
     }
 
@@ -30,7 +31,7 @@ interface IPrivateVoting {
 
     function castVote(uint256 voteId, uint256 c1, uint256 c2, bytes calldata proof) external;
 
-    function createVote(uint256 endBlock, uint256 minQuorum, string calldata description) external;
+    function createVote(uint256 endBlock, uint256 minQuorum, string calldata ref) external;
 
     function getVote(uint256 voteId) external view returns (Vote memory);
 

@@ -43,15 +43,15 @@ contract PrivateVoting is IPrivateVoting, Ownable {
         (uint256 newC1, uint256 newC2) = Elgamal.aggregate(vote.c1, vote.c2, c1, c2);
         vote.c1 = newC1;
         vote.c2 = newC2;
-        // ...
+        vote.numberOfVotes++;
 
         emit VoteCasted(voteId);
     }
 
     /// @inheritdoc IPrivateVoting
-    function createVote(uint256 endBlock, uint256 minQuorum, string calldata description) external onlyOwner {
+    function createVote(uint256 endBlock, uint256 minQuorum, string calldata ref) external onlyOwner {
         uint256 voteId = numberOfVotes;
-        _votes[voteId] = Vote(endBlock, minQuorum, 1, 1, 0, description, VoteState.Created);
+        _votes[voteId] = Vote(endBlock, minQuorum, 0, 1, 1, 0, ref, VoteState.Created);
         numberOfVotes++;
         emit VoteCreated(voteId);
     }
