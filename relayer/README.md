@@ -13,7 +13,7 @@ curl -fsSL https://bun.sh/install | bash
 Then, clone the repository and install dependencies:
 
 ```sh
-git clone https://github.com/substance-labs/noir-hack-private-voting
+git clone https://github.com/substance-labs/noir-hack-revelio
 cd relayer
 nvm use
 bun install

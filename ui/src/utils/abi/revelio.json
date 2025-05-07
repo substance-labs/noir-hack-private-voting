@@ -124,7 +124,7 @@
       {
         "name": "",
         "type": "tuple",
-        "internalType": "struct IPrivateVoting.Vote",
+        "internalType": "struct IRevelio.Vote",
         "components": [
           {
             "name": "endBlock",
@@ -159,7 +159,7 @@
           {
             "name": "state",
             "type": "uint8",
-            "internalType": "enum IPrivateVoting.VoteState"
+            "internalType": "enum IRevelio.VoteState"
           }
         ]
       }

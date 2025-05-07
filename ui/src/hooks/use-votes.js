@@ -3,7 +3,7 @@ import { sepolia } from "viem/chains"
 import { useEffect, useState } from "react"
 
 import settings from "../settings/index.js"
-import privateVotingAbi from "../utils/abi/private-voting.json"
+import revelioAbi from "../utils/abi/revelio.json"
 
 export const useVotes = () => {
   const [votes, setVotes] = useState([])
@@ -17,16 +17,16 @@ export const useVotes = () => {
         })
 
         const totalNumberOfVotes = await client.readContract({
-          abi: privateVotingAbi,
-          address: settings.addresses.privateVoting,
+          abi: revelioAbi,
+          address: settings.addresses.revelio,
           functionName: "numberOfVotes",
         })
 
         const votes = await Promise.all(
           Array.from({ length: Number(totalNumberOfVotes) }, (_, voteId) =>
             client.readContract({
-              abi: privateVotingAbi,
-              address: settings.addresses.privateVoting,
+              abi: revelioAbi,
+              address: settings.addresses.revelio,
               functionName: "getVote",
               args: [voteId],
             }),

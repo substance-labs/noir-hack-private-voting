@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.28;
 
-interface IPrivateVoting {
+interface IRevelio {
     enum VoteState {
         NotCreated,
         Created,

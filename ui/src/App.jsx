@@ -60,7 +60,7 @@ const App = () => {
     <div className="flex h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white font-sans">
       {/* Sidebar */}
       <aside className="w-64 bg-white/5 border-r border-white/10 backdrop-blur-md p-6 space-y-6 hidden md:flex flex-col">
-        <div className="text-xl font-bold">🛡️ Private Voting</div>
+        <div className="text-xl font-bold">🛡️ Revelio</div>
         <nav className="flex flex-col space-y-4">
           <button className="flex items-center space-x-2 text-gray-300 hover:text-white">
             <Home className="w-5 h-5" />

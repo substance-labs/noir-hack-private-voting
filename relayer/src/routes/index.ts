@@ -2,7 +2,7 @@ import { createWalletClient, http } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { sepolia } from "viem/chains"
 
-import privateVotingAbi from "../abi/private-voting.json"
+import revelioAbi from "../abi/revelio.json"
 import settings from "../settings"
 
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify"
@@ -24,8 +24,8 @@ async function castVote(fastify: FastifyInstance, req: FastifyRequest<{ Body: Ca
   })
 
   const transactionHash = await client.writeContract({
-    address: settings.addresses.privateVoting as `0x${string}`,
-    abi: privateVotingAbi,
+    address: settings.addresses.revelio as `0x${string}`,
+    abi: revelioAbi,
     functionName: "castVote",
     args: [voteId, c1, c2, proof],
   })
