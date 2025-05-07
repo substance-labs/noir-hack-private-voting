@@ -1,0 +1,7 @@
+[package]
+name = "vote_revealer"
+type = "bin"
+authors = [""]
+
+[dependencies]
+elgamal = { path = "../elgamal" }
