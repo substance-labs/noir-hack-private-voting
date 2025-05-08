@@ -178,10 +178,19 @@ const Home = () => {
                 <p className="text-white">Waiting for proof generation...</p>
               ) : (
                 <>
-                  <QRCode value={url} size={220} bgColor="transparent" fgColor="white" />
-                  <p className="text-sm text-gray-300 mt-4">
+                  <QRCode value={url} size={240} bgColor="transparent" fgColor="white" />
+                  <p className="text-md text-gray-300 mt-4">
                     Scan this QR code to open the <span className="text-white font-semibold">zkPassport</span> app on
-                    your phone.
+                    your phone, or click{" "}
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 underline font-semibold"
+                    >
+                      here
+                    </a>{" "}
+                    instead.
                   </p>
                 </>
               )}
