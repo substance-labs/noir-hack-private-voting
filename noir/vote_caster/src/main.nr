@@ -42,13 +42,13 @@ fn test_main() {
     let pub_key = g.pow_32(priv_key);
     let pub_key_hash = Poseidon2::hash([pub_key], 1);
 
-    let votes = [0, 1, 0, 0, 0]; // multiple selection. In this case we vote for the option 2
+    let vote = [0, 1, 0, 0, 0]; // multiple selection. In this case we vote for the option 2
     let vote_randomness = [200, 201, 202, 203, 204];
     let mut expected_c1s = [0, 0, 0, 0, 0];
     let mut expected_c2s = [0, 0, 0, 0, 0];
 
     for i in 0..5 {
-        let (c1, c2) = encrypt(g, pub_key, votes[i], vote_randomness[i]);
+        let (c1, c2) = encrypt(g, pub_key, vote[i], vote_randomness[i]);
         expected_c1s[i] = c1;
         expected_c2s[i] = c2;
     }
@@ -56,7 +56,7 @@ fn test_main() {
     std::println(g);
     std::println(pub_key);
     std::println(pub_key_hash);
-    std::println(votes);
+    std::println(vote);
     std::println(vote_randomness);
     std::println(expected_c1s);
     std::println(expected_c2s);
@@ -65,7 +65,7 @@ fn test_main() {
         g,
         pub_key,
         pub_key_hash,
-        votes,
+        vote,
         vote_randomness,
         expected_c1s,
         expected_c2s,
