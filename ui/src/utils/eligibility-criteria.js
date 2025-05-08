@@ -7,7 +7,7 @@ export const ruleToText = (rule) => {
   }
 
   if (rule.includes("age < ")) {
-    const age = rule.slice(7)
+    const age = rule.slice(6)
     return `You must be under ${age} years old to vote.`
   }
 

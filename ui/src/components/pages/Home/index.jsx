@@ -27,7 +27,7 @@ const Home = () => {
     try {
       const voteId = Object.keys(selected).at(0)
       const selectedVoteIndex = Object.values(selected).at(0)
-      const selectedVote = votes[votes.length - voteId - 1]  // because of votes.inverse()
+      const selectedVote = votes[votes.length - voteId - 1] // because of votes.inverse()
 
       const nOptions = selectedVote.options.length
       const vote = Array.from({ length: nOptions }).fill(0)
