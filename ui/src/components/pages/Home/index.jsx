@@ -13,6 +13,7 @@ import { useVotes } from "../../../hooks/use-votes"
 import Modal from "../../base/Modal"
 import Sidebar from "../../base/Sidebar"
 import Header from "../../base/Header"
+import DevModeAlert from "../../base/DevModeAlert"
 
 const Home = () => {
   const [url, setUrl] = useState(null)
@@ -81,6 +82,9 @@ const Home = () => {
 
       <main className="flex-1 overflow-y-auto space-y-4">
         <Header title={"Home"} />
+        <div className="pl-4 pr-4">
+          <DevModeAlert />
+        </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 pl-4 pr-4">
           {votes.map((v) => (

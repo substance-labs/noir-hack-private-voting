@@ -1,9 +1,9 @@
 import { Bell } from "lucide-react"
 import { Menu } from "lucide-react"
-import { useSidebar } from "../../contexts/SidebarContext"
+import { useAppStore } from "../../../store"
 
 const Header = ({ title }) => {
-  const { openSidebar } = useSidebar()
+  const { openSidebar } = useAppStore()
 
   return (
     <header className="w-full flex items-center justify-between px-6 py-4 bg-white/5 backdrop-blur-md border-b border-white/10 shadow-sm z-50 ">
