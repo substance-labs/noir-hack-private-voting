@@ -9,7 +9,9 @@ const fastify = Fastify({
   exposeHeadRoutes: true,
 })
 
+const isDevMode = process.env.NODE_ENV !== "production"
 const port = parseInt(process.env.PORT as string) || 3000
+
 fastify.route({
   method: "OPTIONS",
   url: "/*",
@@ -18,21 +20,27 @@ fastify.route({
     if (reqAllowedHeaders !== undefined) {
       reply.header("Access-Control-Allow-Headers", reqAllowedHeaders)
     }
-    reply
-      .code(204)
-      .header("Content-Length", "0")
-      .header("Access-Control-Allow-Origin", "http://localhost:5173")
-      .header("Access-Control-Allow-Credentials", true)
-      .header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE")
-      .send()
+    if (isDevMode) {
+      reply
+        .code(204)
+        .header("Content-Length", "0")
+        .header("Access-Control-Allow-Origin", "http://localhost:5173")
+        .header("Access-Control-Allow-Credentials", true)
+        .header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE")
+        .send()
+    } else {
+      reply.code(204).send()
+    }
   },
 })
 
-fastify.addHook("onRequest", function (request, reply, next) {
-  reply.header("Access-Control-Allow-Origin", "http://localhost:5173")
-  reply.header("Access-Control-Allow-Credentials", true)
-  next()
-})
+if (isDevMode) {
+  fastify.addHook("onRequest", function (request, reply, next) {
+    reply.header("Access-Control-Allow-Origin", "http://localhost:5173")
+    reply.header("Access-Control-Allow-Credentials", true)
+    next()
+  })
+}
 
 fastify.register(routes, { prefix: "/" })
 
