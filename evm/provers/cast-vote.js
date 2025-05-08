@@ -7,6 +7,14 @@ import { encodeAbiParameters } from "viem"
 import { fileURLToPath } from "url"
 import { aggregate, encrypt } from "./elgamal.js"
 
+function splitIntoChunks(str, size = 32) {
+  const chunks = []
+  for (let i = 0; i < str.length; i += size) {
+    chunks.push(str.slice(i, i + size))
+  }
+  return chunks
+}
+
 try {
   const __filename = fileURLToPath(import.meta.url)
   const __dirname = path.dirname(__filename)
@@ -20,10 +28,16 @@ try {
   const g = process.argv[2]
   const pubKey = process.argv[3]
   const pubKeyHash = process.argv[4]
-  const vote = process.argv[5]
-  const voteRandomness = process.argv[6]
+  const vote = splitIntoChunks(process.argv[5].slice(2), 64).map((vote) => "0x" + vote)
+  const voteRandomness = splitIntoChunks(process.argv[6].slice(2), 64).map((vote) => "0x" + vote)
 
-  const [c1, c2] = encrypt(bigInt(g), bigInt(pubKey), bigInt(vote), bigInt(voteRandomness))
+  const expectedC1s = []
+  const expectedC2s = []
+  vote.forEach((v, index) => {
+    const [c1, c2] = encrypt(bigInt(g), bigInt(pubKey), bigInt(v), bigInt(voteRandomness[index]))
+    expectedC1s[index] = c1
+    expectedC2s[index] = c2
+  })
 
   const { witness } = await noir.execute({
     g,
@@ -31,16 +45,16 @@ try {
     vote_randomness: voteRandomness,
     pub_key: pubKey,
     pub_key_hash: pubKeyHash,
-    expected_c1: c1,
-    expected_c2: c2,
+    expected_c1s: expectedC1s,
+    expected_c2s: expectedC2s,
   })
   const { proof } = await backend.generateProof(witness, { keccak: true })
 
   const result = encodeAbiParameters(
-    [{ type: "bytes32" }, { type: "bytes32" }, { type: "bytes" }],
+    [{ type: "bytes32[]" }, { type: "bytes32[]" }, { type: "bytes" }],
     [
-      "0x" + c1.toString(16).padStart(64, "0"),
-      "0x" + c2.toString(16).padStart(64, "0"),
+      expectedC1s.map((c1) => "0x" + c1.toString(16).padStart(64, "0")),
+      expectedC2s.map((c2) => "0x" + c2.toString(16).padStart(64, "0")),
       "0x" + Buffer.from(proof).toString("hex"),
     ],
   )

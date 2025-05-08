@@ -20,12 +20,18 @@ contract RevelioTest is Test {
     function test_cast_vote() public {
         uint256 endBlock = block.number + 1000;
         uint256 minQuorum = 500000000000000000; // 0.5 -> 50%
+        uint256 nOptions = 5;
         string memory description = "bla bla bla";
-        revelio.createVote(endBlock, minQuorum, description);
+        revelio.createVote(endBlock, minQuorum, nOptions, description);
 
         uint256 voteId = 0;
-        uint256 intention = 1; // this is a private input
-        uint256 voteRandomness = block.number; // this is a private input
+        uint256[] memory intention = new uint256[](nOptions); // this is a private input
+        uint256[] memory votesRandomness = new uint256[](nOptions); // this is a private input
+
+        for (uint256 i = 0; i < nOptions; i++) {
+            intention[i] = i == 0 ? 1 : 0;
+            votesRandomness[i] = i + 1;
+        }
 
         string[] memory inputs = new string[](3);
         inputs[0] = "sh";
@@ -40,12 +46,13 @@ contract RevelioTest is Test {
             " ",
             iToHex(abi.encodePacked(intention)),
             " ",
-            iToHex(abi.encodePacked(voteRandomness))
+            iToHex(abi.encodePacked(votesRandomness))
         );
 
         bytes memory result = vm.ffi(inputs);
-        (uint256 c1, uint256 c2, bytes memory proof) = abi.decode(result, (uint256, uint256, bytes));
-        revelio.castVote(voteId, c1, c2, proof);
+        (uint256[] memory c1s, uint256[] memory c2s, bytes memory proof) =
+            abi.decode(result, (uint256[], uint256[], bytes));
+        revelio.castVote(voteId, c1s, c2s, proof);
     }
 
     function iToHex(bytes memory buffer) public pure returns (string memory) {

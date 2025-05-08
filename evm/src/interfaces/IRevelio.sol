@@ -13,9 +13,9 @@ interface IRevelio {
         uint256 endBlock;
         uint256 minQuorum;
         uint256 numberOfVotes;
-        uint256 c1;
-        uint256 c2;
-        uint256 result;
+        uint256[] c1s;
+        uint256[] c2s;
+        uint256[] result;
         string ref;
         VoteState state;
     }
@@ -29,9 +29,9 @@ interface IRevelio {
     error VoteDoesNotExist();
     error VoteStillActive();
 
-    function castVote(uint256 voteId, uint256 c1, uint256 c2, bytes calldata proof) external;
+    function castVote(uint256 voteId, uint256[] calldata c1s, uint256[] calldata c2s, bytes calldata proof) external;
 
-    function createVote(uint256 endBlock, uint256 minQuorum, string calldata ref) external;
+    function createVote(uint256 endBlock, uint256 minQuorum, uint256 nOptions, string calldata ref) external;
 
     function getVote(uint256 voteId) external view returns (Vote memory);
 

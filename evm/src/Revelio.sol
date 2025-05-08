@@ -23,7 +23,7 @@ contract Revelio is IRevelio, Ownable {
     }
 
     /// @inheritdoc IRevelio
-    function castVote(uint256 voteId, uint256 c1, uint256 c2, bytes calldata proof) external {
+    function castVote(uint256 voteId, uint256[] calldata c1s, uint256[] calldata c2s, bytes calldata proof) external {
         Vote storage vote = _votes[voteId];
         require(vote.state == VoteState.Created, InvalidVoteState());
         require(vote.endBlock > block.number, VoteStillActive());
@@ -33,25 +33,44 @@ contract Revelio is IRevelio, Ownable {
         require(!_castedVotes[voteId][voterId]);
         _castedVotes[voteId][voterId] = true;*/
 
-        bytes32[] memory publicInputs = new bytes32[](4);
+        uint256 nOptions = vote.c1s.length;
+        bytes32[] memory publicInputs = new bytes32[](2 + (2 * nOptions));
         publicInputs[0] = GENERATOR;
         publicInputs[1] = PUBLIC_KEY_HASH;
-        publicInputs[2] = bytes32(c1);
-        publicInputs[3] = bytes32(c2);
+        for (uint256 i = 0; i < nOptions; i++) {
+            publicInputs[2 + i] = bytes32(c1s[i]);
+            publicInputs[2 + nOptions + i] = bytes32(c2s[i]);
+        }
+
         require(CAST_VOTE_VERIFIER.verify(proof, publicInputs), InvalidProof());
 
-        (uint256 newC1, uint256 newC2) = Elgamal.aggregate(vote.c1, vote.c2, c1, c2);
-        vote.c1 = newC1;
-        vote.c2 = newC2;
+        require(c1s.length == c2s.length && c1s.length == nOptions);
+        for (uint256 i = 0; i < c1s.length; i++) {
+            (uint256 c1, uint256 c2) = Elgamal.aggregate(vote.c1s[i], vote.c2s[i], c1s[i], c2s[i]);
+            vote.c1s[i] = c1;
+            vote.c2s[i] = c2;
+        }
         vote.numberOfVotes++;
 
         emit VoteCasted(voteId);
     }
 
     /// @inheritdoc IRevelio
-    function createVote(uint256 endBlock, uint256 minQuorum, string calldata ref) external onlyOwner {
+    function createVote(uint256 endBlock, uint256 minQuorum, uint256 nOptions, string calldata ref)
+        external
+        onlyOwner
+    {
         uint256 voteId = numberOfVotes;
-        _votes[voteId] = Vote(endBlock, minQuorum, 0, 1, 1, 0, ref, VoteState.Created);
+
+        uint256[] memory result = new uint256[](nOptions);
+        uint256[] memory c1s = new uint256[](nOptions);
+        uint256[] memory c2s = new uint256[](nOptions);
+        for (uint256 i = 0; i < nOptions; i++) {
+            c1s[i] = 1;
+            c2s[i] = 1;
+        }
+
+        _votes[voteId] = Vote(endBlock, minQuorum, 0, c1s, c2s, result, ref, VoteState.Created);
         numberOfVotes++;
         emit VoteCreated(voteId);
     }
