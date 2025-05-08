@@ -2,7 +2,9 @@ import React, { useCallback, useState } from "react"
 import QRCode from "react-qr-code"
 import { Slide, toast, ToastContainer } from "react-toastify"
 import { motion } from "framer-motion"
-import { Home } from "lucide-react"
+import { BarChart3, CalendarDays, Home, Info } from "lucide-react"
+import { createPublicClient, http } from "viem"
+import { sepolia } from "viem/chains"
 
 import { getCastVoteProof, getZkPassportProof } from "./utils/vote"
 import settings from "./settings"
@@ -14,20 +16,24 @@ const App = () => {
   const [url, setUrl] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [selected, setSelected] = useState({})
-  const votes = useVotes()
+  const { votes, fetchVotes } = useVotes()
 
   const onVote = useCallback(async () => {
     try {
       const voteId = Object.keys(selected).at(0)
-      const nOptions = votes[voteId].options.length
       const selectedVoteIndex = Object.values(selected).at(0)
+      const selectedVote = votes[voteId]
+
+      const nOptions = selectedVote.options.length
       const vote = Array.from({ length: nOptions }).fill(0)
       vote[selectedVoteIndex] = 1
 
       const [zkPassportProof, castVoteProof] = await Promise.all([
         getZkPassportProof({
-          voteId: selected,
+          voteId,
           onUrl: (url) => setUrl(url),
+          purpose: selectedVote.zkPassportData.purpose,
+          rules: selectedVote.zkPassportData.rules,
           onRequestReceived: () => {
             setUrl(null)
             setIsLoading(true)
@@ -52,12 +58,19 @@ const App = () => {
       console.log(transactionHash)
 
       toast.success("You succesfully voted!")
+      setIsLoading(false)
+
+      const client = createPublicClient({
+        chain: sepolia,
+        transport: http(settings.rpc),
+      })
+      await client.waitForTransactionReceipt({ hash: transactionHash })
+      fetchVotes()
     } catch (err) {
       console.error(err)
-    } finally {
       setIsLoading(false)
     }
-  }, [selected])
+  }, [selected, votes, fetchVotes])
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white font-sans">
@@ -81,16 +94,44 @@ const App = () => {
           </div>
         </header>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 pt-22 pl-4 pr-4">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 pt-22 pl-4 pr-4">
           {votes.map((v) => (
             <motion.div
               key={v.id}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              className="backdrop-blur-md bg-white/10 p-6 rounded-2xl border border-white/20 shadow-xl space-y-4"
+              className="backdrop-blur-md bg-white/10 p-6 rounded-2xl border border-white/20 shadow-xl"
             >
-              <h2 className="text-xl font-semibold ">{v.title}</h2>
+              <div className="mb-4 text-white">
+                <h2 className="text-xl font-semibold leading-snug">
+                  <span className="inline">
+                    {v.title}
+                    {v?.zkPassportData?.purpose && (
+                      <span className="relative ml-2 group cursor-pointer">
+                        <Info size={16} className="inline text-gray-400 hover:text-white" />
+                        <div className="absolute left-1/2 top-full w-64 -translate-x-1/2 rounded-md bg-gray-800 text-gray-100 text-xs p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                          {v.zkPassportData.purpose}
+                        </div>
+                      </span>
+                    )}
+                  </span>
+                </h2>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-gray-400 mt-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <CalendarDays size={16} />
+                  <span className="truncate">Ends: {v.endsIn}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <BarChart3 size={16} />
+                  <span>
+                    {v.numberOfVotes} vote{v.numberOfVotes === 1n ? "" : "s"}
+                  </span>
+                </div>
+              </div>
+
               <div className="pt-2 y-gap-2 flex flex-col space-y-3">
                 {v.options.map((option, index) => (
                   <motion.button
@@ -118,7 +159,7 @@ const App = () => {
                 whileTap={{ scale: 0.96 }}
                 onClick={onVote}
                 disabled={selected[v.id] === undefined}
-                className="w-full mt-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 cursor-pointer
+                className="w-full mt-6 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 cursor-pointer
                   bg-gradient-to-r from-cyan-500 to-purple-500 hover:opacity-90
                   disabled:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50 shadow"
               >

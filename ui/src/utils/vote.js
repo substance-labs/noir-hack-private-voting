@@ -12,20 +12,32 @@ import acvm from "@noir-lang/acvm_js/web/acvm_js_bg.wasm?url"
 import noirc from "@noir-lang/noirc_abi/web/noirc_abi_wasm_bg.wasm?url"
 await Promise.all([initACVM(fetch(acvm)), initNoirC(fetch(noirc))])
 
-export const getZkPassportProof = async ({ voteId, onUrl, onRequestReceived: _onRequestReceived }) => {
+export const getZkPassportProof = async ({ voteId, onUrl, purporse, rules, onRequestReceived: _onRequestReceived }) => {
   const zkPassport = new ZKPassport()
 
   const queryBuilder = await zkPassport.request({
-    name: "ZKPassport",
+    name: "Revelio",
     logo: "https://zkpassport.id/logo.png",
-    purpose: "Prove you are an adult from Italy",
+    purpose: purporse || "",
     scope: voteId.toString(),
     devMode: true,
     mode: "fast",
   })
 
+  rules.forEach((rule) => {
+    if (rule.includes("age >= ")) {
+      const age = rule.slice(7)
+      queryBuilder.gte("age", age)
+    }
+
+    if (rule.includes("nationality == ")) {
+      const nationality = rule.slice(15)
+      queryBuilder.in("nationality", [nationality])
+    }
+  })
+
   const { url, requestId, onRequestReceived, onGeneratingProof, onProofGenerated, onResult, onReject, onError } =
-    queryBuilder.gte("age", 18).in("nationality", ["Italy"]).done()
+    queryBuilder.done()
 
   onUrl(url)
 
