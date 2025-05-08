@@ -74,7 +74,7 @@ const Sidebar = () => {
             <Terminal className="w-4 h-4 text-green-400" />
             <span className={devMode ? "text-green-400" : "text-gray-500"}>Dev Mode: {devMode ? "ON" : "OFF"}</span>
           </div>
-
+          <div className="border-t border-white/10 my-3" />
           <p>v{version} • by @SubstanceLabs</p>
         </div>
       </aside>

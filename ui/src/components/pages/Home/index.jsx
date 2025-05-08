@@ -14,6 +14,8 @@ import Modal from "../../base/Modal"
 import Sidebar from "../../base/Sidebar"
 import Header from "../../base/Header"
 import DevModeAlert from "../../base/DevModeAlert"
+import ColoredBadge from "../../base/ColoredBadge"
+import { ruleToText } from "../../../utils/eligibility-criteria"
 
 const Home = () => {
   const [url, setUrl] = useState(null)
@@ -25,7 +27,7 @@ const Home = () => {
     try {
       const voteId = Object.keys(selected).at(0)
       const selectedVoteIndex = Object.values(selected).at(0)
-      const selectedVote = votes[voteId]
+      const selectedVote = votes[votes.length - voteId - 1]  // because of votes.inverse()
 
       const nOptions = selectedVote.options.length
       const vote = Array.from({ length: nOptions }).fill(0)
@@ -79,13 +81,11 @@ const Home = () => {
   return (
     <div className="flex h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white font-sans">
       <Sidebar />
-
       <main className="flex-1 overflow-y-auto space-y-4">
         <Header title={"Home"} />
         <div className="pl-4 pr-4">
           <DevModeAlert />
         </div>
-
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 pl-4 pr-4">
           {votes.map((v) => (
             <motion.div
@@ -97,21 +97,10 @@ const Home = () => {
             >
               <div className="mb-4 text-white">
                 <h2 className="text-xl font-semibold leading-snug">
-                  <span className="inline">
-                    {v.title}
-                    {v?.zkPassportData?.purpose && (
-                      <span className="relative ml-2 group cursor-pointer">
-                        <Info size={16} className="inline text-gray-400 hover:text-white" />
-                        <div className="absolute left-1/2 top-full w-64 -translate-x-1/2 rounded-md bg-gray-800 text-gray-100 text-xs p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                          {v.zkPassportData.purpose}
-                        </div>
-                      </span>
-                    )}
-                  </span>
+                  <span className="inline">{v.title}</span>
                 </h2>
               </div>
-
-              <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-gray-400 mt-2 mb-4">
+              <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-gray-400 mt-4 mb-2">
                 <div className="flex items-center gap-2">
                   <CalendarDays size={16} />
                   <span className="truncate">Ends: {v.endsIn}</span>
@@ -123,7 +112,23 @@ const Home = () => {
                   </span>
                 </div>
               </div>
-
+              <div className="border-t border-white/10 my-3" />
+              <div className="flex flex-wrap gap-2 ">
+                {v?.zkPassportData?.rules?.map((rule) => {
+                  const tooltipText = ruleToText(rule)
+                  return (
+                    tooltipText && (
+                      <span className="relative group cursor-pointer">
+                        <ColoredBadge key={`${v.id}-badge-${rule}`} label={rule} />
+                        <div className="absolute left-1/2 top-full w-64 z-1000 -translate-x-1/2 rounded-md bg-gray-800 text-gray-100 text-xs p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                          {tooltipText}
+                        </div>
+                      </span>
+                    )
+                  )
+                })}
+              </div>
+              <div className="border-t border-white/10 my-3" />
               <div className="pt-2 y-gap-2 flex flex-col space-y-3">
                 {v.options.map((option, index) => (
                   <motion.button
@@ -183,7 +188,6 @@ const Home = () => {
             </motion.div>
           </Modal>
         )}
-
         <ToastContainer theme="dark" transition={Slide} autoClose={2000} hideProgressBar newestOnTop />
       </main>
     </div>

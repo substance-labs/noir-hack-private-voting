@@ -37,6 +37,11 @@ export const getZkPassportProof = async ({
       queryBuilder.gte("age", age)
     }
 
+    if (rule.includes("age < ")) {
+      const age = rule.slice(7)
+      queryBuilder.lt("age", age)
+    }
+
     if (rule.includes("nationality == ")) {
       const nationality = rule.slice(15)
       queryBuilder.in("nationality", [nationality])
