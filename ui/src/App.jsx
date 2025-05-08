@@ -13,15 +13,20 @@ import Modal from "./components/Modal"
 const App = () => {
   const [url, setUrl] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [vote, setVote] = useState(null)
-  const [selectedVoteId, setSelectedVoteId] = useState(1)
+  const [selected, setSelected] = useState({})
   const votes = useVotes()
 
   const onVote = useCallback(async () => {
     try {
+      const voteId = Object.keys(selected).at(0)
+      const nOptions = votes[voteId].options.length
+      const selectedVoteIndex = Object.values(selected).at(0)
+      const vote = Array.from({ length: nOptions }).fill(0)
+      vote[selectedVoteIndex] = 1
+
       const [zkPassportProof, castVoteProof] = await Promise.all([
         getZkPassportProof({
-          voteId: selectedVoteId,
+          voteId: selected,
           onUrl: (url) => setUrl(url),
           onRequestReceived: () => {
             setUrl(null)
@@ -29,22 +34,20 @@ const App = () => {
           },
         }),
         getCastVoteProof({
-          vote: vote === "yes" ? 1 : 0,
+          vote,
         }),
       ])
-      console.log(zkPassportProof)
-      console.log(castVoteProof)
 
       const { publicInputs, proof } = castVoteProof
-      const c1 = publicInputs[2]
-      const c2 = publicInputs[3]
+      const c1s = publicInputs.slice(2, 2 + nOptions)
+      const c2s = publicInputs.slice(2 + nOptions, 2 + nOptions * 2)
 
       const { transactionHash } = await fetch(`${settings.apiUrl}/cast-vote`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ voteId: selectedVoteId, c1, c2, proof: "0x" + Buffer.from(proof).toString("hex") }),
+        body: JSON.stringify({ voteId, c1s, c2s, proof: "0x" + Buffer.from(proof).toString("hex") }),
       }).then((res) => res.json())
       console.log(transactionHash)
 
@@ -54,7 +57,7 @@ const App = () => {
     } finally {
       setIsLoading(false)
     }
-  }, [selectedVoteId])
+  }, [selected])
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white font-sans">
@@ -87,47 +90,35 @@ const App = () => {
               transition={{ duration: 0.4, ease: "easeOut" }}
               className="backdrop-blur-md bg-white/10 p-6 rounded-2xl border border-white/20 shadow-xl space-y-4"
             >
-              <h2 className="text-xl font-semibold">{v.description}</h2>
-              <div className="flex justify-center space-x-6 pt-2">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    setSelectedVoteId(v.id)
-                    setVote("yes")
-                  }}
-                  className={`px-4 py-2 rounded-full text-sm transition-all font-medium cursor-pointer
-                    ${
-                      vote === "yes" && selectedVoteId === v.id
-                        ? "bg-cyan-500 shadow-md text-white"
-                        : "bg-white/10 hover:bg-cyan-500/20 text-gray-200"
-                    }`}
-                >
-                  YES
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    setSelectedVoteId(v.id)
-                    setVote("no")
-                  }}
-                  className={`px-4 py-2 rounded-full text-sm transition-all font-medium cursor-pointer
-                    ${
-                      vote === "no" && selectedVoteId === v.id
-                        ? "bg-purple-500 shadow-md text-white"
-                        : "bg-white/10 hover:bg-purple-500/20 text-gray-200"
-                    }`}
-                >
-                  NO
-                </motion.button>
+              <h2 className="text-xl font-semibold ">{v.title}</h2>
+              <div className="pt-2 y-gap-2 flex flex-col space-y-3">
+                {v.options.map((option, index) => (
+                  <motion.button
+                    key={v.id + option}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setSelected({
+                        [v.id]: index,
+                      })
+                    }}
+                    className={`px-4 py-2 rounded-full text-sm transition-all font-medium cursor-pointer
+                      ${
+                        selected[v.id] === index
+                          ? "bg-cyan-500 shadow-md text-white"
+                          : "bg-white/10 hover:bg-cyan-500/20 text-gray-200"
+                      }`}
+                  >
+                    {option}
+                  </motion.button>
+                ))}
               </div>
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={onVote}
-                disabled={selectedVoteId !== v.id || !vote}
-                className="w-full mt-4 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 cursor-pointer
+                disabled={selected[v.id] === undefined}
+                className="w-full mt-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 cursor-pointer
                   bg-gradient-to-r from-cyan-500 to-purple-500 hover:opacity-90
                   disabled:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50 shadow"
               >

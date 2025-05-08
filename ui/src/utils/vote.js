@@ -20,6 +20,8 @@ export const getZkPassportProof = async ({ voteId, onUrl, onRequestReceived: _on
     logo: "https://zkpassport.id/logo.png",
     purpose: "Prove you are an adult from Italy",
     scope: voteId.toString(),
+    devMode: true,
+    mode: "fast",
   })
 
   const { url, requestId, onRequestReceived, onGeneratingProof, onProofGenerated, onResult, onReject, onError } =
@@ -70,17 +72,24 @@ export const getCastVoteProof = async ({ vote }) => {
   const g = "0x02" // TODO
   const pubKey = "0x0400" // TODO
   const pubKeyHash = "0x22f162a4e96080597d7c32dffe2d6beee811fe65cbf4774850fd51d41550ca7e"
-  const voteRandomness = "0x" + bigInt.randBetween(0, 1000000).toString(16) // TODO
+  const voteRandomness = vote.map(() => "0x" + bigInt.randBetween(0, 1000000).toString(16)) // TODO
 
-  const [c1, c2] = encrypt(bigInt(g), bigInt(pubKey), bigInt(vote), bigInt(voteRandomness))
+  const expectedC1s = []
+  const expectedC2s = []
+  vote.forEach((v, index) => {
+    const [c1, c2] = encrypt(bigInt(g), bigInt(pubKey), bigInt(v), bigInt(voteRandomness[index]))
+    expectedC1s[index] = "0x" + c1.toString(16)
+    expectedC2s[index] = "0x" + c2.toString(16)
+  })
+
   const { witness } = await noir.execute({
     g,
     vote,
     vote_randomness: voteRandomness,
     pub_key: pubKey,
     pub_key_hash: pubKeyHash,
-    expected_c1: "0x" + c1.toString(16),
-    expected_c2: "0x" + c2.toString(16),
+    expected_c1s: expectedC1s,
+    expected_c2s: expectedC2s,
   })
   return await backend.generateProof(witness, { keccak: true })
 }

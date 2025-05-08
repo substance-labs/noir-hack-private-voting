@@ -69,14 +69,14 @@
         "internalType": "uint256"
       },
       {
-        "name": "c1",
-        "type": "uint256",
-        "internalType": "uint256"
+        "name": "c1s",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
       },
       {
-        "name": "c2",
-        "type": "uint256",
-        "internalType": "uint256"
+        "name": "c2s",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
       },
       {
         "name": "proof",
@@ -102,7 +102,12 @@
         "internalType": "uint256"
       },
       {
-        "name": "description",
+        "name": "nOptions",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "ref",
         "type": "string",
         "internalType": "string"
       }
@@ -137,22 +142,27 @@
             "internalType": "uint256"
           },
           {
-            "name": "c1",
+            "name": "numberOfVotes",
             "type": "uint256",
             "internalType": "uint256"
           },
           {
-            "name": "c2",
-            "type": "uint256",
-            "internalType": "uint256"
+            "name": "c1s",
+            "type": "uint256[]",
+            "internalType": "uint256[]"
+          },
+          {
+            "name": "c2s",
+            "type": "uint256[]",
+            "internalType": "uint256[]"
           },
           {
             "name": "result",
-            "type": "uint256",
-            "internalType": "uint256"
+            "type": "uint256[]",
+            "internalType": "uint256[]"
           },
           {
-            "name": "description",
+            "name": "ref",
             "type": "string",
             "internalType": "string"
           },

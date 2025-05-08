@@ -33,10 +33,18 @@ export const useVotes = () => {
           ),
         )
 
+        const contents = await Promise.all(
+          votes.map(async ({ ref }) => {
+            const response = fetch(`${settings.ipfsGateway}/${ref.slice(7)}`) // remove ipfs://
+            return await (await response).json()
+          }),
+        )
+
         setVotes(
           votes.map((vote, id) => ({
             ...vote,
             id,
+            ...contents[id],
           })),
         )
       } catch (err) {
