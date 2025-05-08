@@ -12,7 +12,14 @@ import acvm from "@noir-lang/acvm_js/web/acvm_js_bg.wasm?url"
 import noirc from "@noir-lang/noirc_abi/web/noirc_abi_wasm_bg.wasm?url"
 await Promise.all([initACVM(fetch(acvm)), initNoirC(fetch(noirc))])
 
-export const getZkPassportProof = async ({ voteId, onUrl, purporse, rules, onRequestReceived: _onRequestReceived }) => {
+export const getZkPassportProof = async ({
+  devMode,
+  onRequestReceived: _onRequestReceived,
+  onUrl,
+  purporse,
+  rules,
+  voteId,
+}) => {
   const zkPassport = new ZKPassport()
 
   const queryBuilder = await zkPassport.request({
@@ -20,7 +27,7 @@ export const getZkPassportProof = async ({ voteId, onUrl, purporse, rules, onReq
     logo: "https://zkpassport.id/logo.png",
     purpose: purporse || "",
     scope: voteId.toString(),
-    devMode: true,
+    devMode,
     mode: "fast",
   })
 

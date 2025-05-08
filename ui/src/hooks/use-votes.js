@@ -50,12 +50,14 @@ export const useVotes = () => {
       )
 
       setVotes(
-        votes.map((vote, id) => ({
-          ...vote,
-          id,
-          ...contents[id],
-          endsIn: endsIn[id],
-        })),
+        votes
+          .map((vote, id) => ({
+            ...vote,
+            id,
+            ...contents[id],
+            endsIn: endsIn[id],
+          }))
+          .reverse(),
       )
     } catch (err) {
       console.error(err)
