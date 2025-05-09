@@ -1,13 +1,14 @@
 import { createPublicClient, http } from "viem"
 import { sepolia } from "viem/chains"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect } from "react"
 import moment from "moment"
 
 import settings from "../settings/index.js"
 import revelioAbi from "../utils/abi/revelio.json"
+import { useAppStore } from "../store.js"
 
 export const useVotes = () => {
-  const [votes, setVotes] = useState([])
+  const { votes, setVotes } = useAppStore()
 
   const fetchVotes = useCallback(async () => {
     try {
@@ -22,19 +23,38 @@ export const useVotes = () => {
         functionName: "numberOfVotes",
       })
 
-      const votes = await Promise.all(
-        Array.from({ length: Number(totalNumberOfVotes) }, (_, voteId) =>
-          client.readContract({
+      const newVotes = await Promise.all(
+        Array.from({ length: Number(totalNumberOfVotes) }, (_, voteId) => {
+          // NOTE: avoid reading from the contract an already stored vote
+          const storedVote = votes[voteId]
+          if (storedVote) {
+            return {
+              endBlock: BigInt(storedVote.endBlock),
+              numberOfVotes: storedVote.numberOfVotes,
+              ref: storedVote.ref,
+            }
+          }
+
+          return client.readContract({
             abi: revelioAbi,
             address: settings.addresses.revelio,
             functionName: "getVote",
             args: [voteId],
-          }),
-        ),
+          })
+        }),
       )
 
       const contents = await Promise.all(
-        votes.map(async ({ ref }) => {
+        newVotes.map(async ({ ref }, index) => {
+          // NOTE: avoid fetching from ipfs an already stored content
+          const storedVote = votes[index]
+          if (storedVote) {
+            return {
+              title: storedVote.title,
+              zkPassportData: storedVote.zkPassportData,
+              options: storedVote.options,
+            }
+          }
           const response = fetch(`${settings.ipfsGateway}/${ref.slice(7)}`) // remove ipfs://
           return await (await response).json()
         }),
@@ -44,15 +64,17 @@ export const useVotes = () => {
       const currentTimestamp = moment().unix()
 
       const endsIn = await Promise.all(
-        votes.map(({ endBlock }) =>
+        newVotes.map(({ endBlock }) =>
           moment.unix(currentTimestamp + parseInt(endBlock - currentBlockNumber) * 12).fromNow(),
         ),
       )
 
       setVotes(
-        votes
+        newVotes
           .map((vote, id) => ({
-            ...vote,
+            ref: vote.ref,
+            endBlock: parseInt(vote.endBlock),
+            numberOfVotes: parseInt(vote.numberOfVotes),
             id,
             ...contents[id],
             endsIn: endsIn[id],
@@ -62,7 +84,7 @@ export const useVotes = () => {
     } catch (err) {
       console.error(err)
     }
-  })
+  }, [votes])
 
   useEffect(() => {
     fetchVotes()

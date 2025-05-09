@@ -9,6 +9,8 @@ export const useAppStore = create(
       sidebarOpen: false,
       closeSidebar: () => set(() => ({ sidebarOpen: false })),
       openSidebar: () => set(() => ({ sidebarOpen: true })),
+      votes: [],
+      setVotes: (votes) => set(() => ({ votes })),
     }),
     {
       name: "rivelio-storage", // name of the item in the storage (must be unique)

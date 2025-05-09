@@ -20,7 +20,7 @@ const Settings = () => {
 
         <div className="px-4 w-full">
           <div className="flex items-center justify-between border border-white/10 p-4 rounded-md bg-white/5 ">
-            <span className="text-sm font-medium">Developer Mode</span>
+            <span className="text-sm font-medium">zkPassport Developer Mode</span>
             <button
               onClick={toggleDevMode}
               className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors ${devMode ? "bg-green-500" : "bg-gray-600"}`}

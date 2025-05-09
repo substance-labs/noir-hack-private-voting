@@ -14,7 +14,9 @@ await Promise.all([initACVM(fetch(acvm)), initNoirC(fetch(noirc))])
 
 export const getZkPassportProof = async ({
   devMode,
+  onGeneratingProof: _onGeneratingProof,
   onRequestReceived: _onRequestReceived,
+  onProofGenerated: _onProofGenerated,
   onUrl,
   purporse,
   rules,
@@ -53,14 +55,9 @@ export const getZkPassportProof = async ({
 
   onUrl(url)
 
-  onRequestReceived(() => {
-    _onRequestReceived()
-    console.log("Request received")
-  })
-
-  onGeneratingProof(() => {
-    console.log("Generating proof")
-  })
+  onRequestReceived(_onRequestReceived)
+  onGeneratingProof(_onGeneratingProof)
+  onProofGenerated(_onProofGenerated)
 
   // NOTE: keep it disabled as mock passports are not supported yet
   /*const waitProofGenerated = () =>
@@ -75,8 +72,16 @@ export const getZkPassportProof = async ({
 
   // NOTE: keep it disabled as mock passports are not supported yet
   /*const waitError = () =>
-    new Promise((_, reject) => {
-      onError(reject)
+    new Promise((resolve, reject) => {
+      onError(error => {
+        console.log(error)
+          if (error.includes("This ID is not supported yet")) {
+            console.error("You are using an ID that is not supported yet")
+            resolve()
+            return
+          }
+          reject(error)
+      })
     })*/
 
   const waitReject = () =>
