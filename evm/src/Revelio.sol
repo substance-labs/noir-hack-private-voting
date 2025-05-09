@@ -67,8 +67,8 @@ contract Revelio is IRevelio, Ownable {
         uint256[] memory c1s = new uint256[](nOptions);
         uint256[] memory c2s = new uint256[](nOptions);
         for (uint256 i = 0; i < nOptions; i++) {
-            c1s[i] = 0;
-            c2s[i] = 0;
+            c1s[i] = 1;
+            c2s[i] = 1;
         }
 
         _votes[voteId] = Vote(endBlock, minQuorum, 0, c1s, c2s, result, ref, VoteState.Created);
