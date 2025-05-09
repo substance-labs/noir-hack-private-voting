@@ -26,15 +26,6 @@ export const useVotes = () => {
       const newVotes = await Promise.all(
         Array.from({ length: Number(totalNumberOfVotes) }, (_, voteId) => {
           // NOTE: avoid reading from the contract an already stored vote
-          const storedVote = votes[votes.length - 1 - voteId]
-          if (storedVote) {
-            return {
-              endBlock: BigInt(storedVote.endBlock),
-              numberOfVotes: storedVote.numberOfVotes,
-              ref: storedVote.ref,
-            }
-          }
-
           return client.readContract({
             abi: revelioAbi,
             address: settings.addresses.revelio,
