@@ -11,9 +11,12 @@ export default defineConfig({
       target: "esnext",
     },
   },
-  define: {
-    "process.browser": "true",
-    "process.version": '"v16.0.0"',
-  },
-  plugins: [react(), tailwindcss(), environmentPlugin(["NODE_DEBUG", "RELAYER_URL", "IPFS_GATEWAY"]), nodePolyfills()],
+  plugins: [
+    nodePolyfills({
+      protocolImports: true,
+    }),
+    react(),
+    tailwindcss(),
+    environmentPlugin(["NODE_DEBUG", "RELAYER_URL", "IPFS_GATEWAY"])
+  ],
 })

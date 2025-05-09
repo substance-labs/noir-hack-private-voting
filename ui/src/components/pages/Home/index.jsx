@@ -156,7 +156,7 @@ const Home = () => {
                     return (
                       tooltipText && (
                         <span key={`${v.id}-badge-${rule}`} className="relative group cursor-pointer">
-                          <ColoredBadge label={rule} />
+                          <ColoredBadge label={rule} labelToSelectColor={rule.split(" ")[0]} />
                           <div className="absolute left-1/2 top-full w-64 z-1000 -translate-x-1/2 rounded-md bg-gray-800 text-gray-100 text-xs p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
                             {tooltipText}
                           </div>
