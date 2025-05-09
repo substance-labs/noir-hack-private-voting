@@ -46,6 +46,7 @@ contract Revelio is IRevelio, Ownable {
 
         require(c1s.length == c2s.length && c1s.length == nOptions);
         for (uint256 i = 0; i < c1s.length; i++) {
+            require(c1s[i] < Elgamal.P && c2s[i] < Elgamal.P, ValueExceedsFieldSize());
             (uint256 c1, uint256 c2) = Elgamal.aggregate(vote.c1s[i], vote.c2s[i], c1s[i], c2s[i]);
             vote.c1s[i] = c1;
             vote.c2s[i] = c2;
@@ -66,8 +67,8 @@ contract Revelio is IRevelio, Ownable {
         uint256[] memory c1s = new uint256[](nOptions);
         uint256[] memory c2s = new uint256[](nOptions);
         for (uint256 i = 0; i < nOptions; i++) {
-            c1s[i] = 1;
-            c2s[i] = 1;
+            c1s[i] = 0;
+            c2s[i] = 0;
         }
 
         _votes[voteId] = Vote(endBlock, minQuorum, 0, c1s, c2s, result, ref, VoteState.Created);

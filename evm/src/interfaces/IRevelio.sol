@@ -26,6 +26,7 @@ interface IRevelio {
 
     error InvalidProof();
     error InvalidVoteState();
+    error ValueExceedsFieldSize();
     error VoteDoesNotExist();
     error VoteStillActive();
 
