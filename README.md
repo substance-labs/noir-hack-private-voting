@@ -50,10 +50,11 @@ Revelio fixes these issues by using:
 
 ```
 revelio/
-├── evm/        # Solidity contracts for poll creation, vote verification, and on-chain tallying
-├── noir/       # Noir circuits for zkPassport proof validation, vote encryption, and vote decryption
-├── relayer/    # Typescript relayer to submit transactions on behalf of users
-└── ui/         # Frontend (React + Tailwind) platform for users to interact with the system
+├── evm/                    # Solidity contracts for poll creation, vote verification, and on-chain tallying
+├── noir/                   # Noir circuits for zkPassport proof validation, vote encryption, and vote decryption
+├── relayer/                # Typescript relayer to submit transactions on behalf of users
+├── report-generator/       # Pythin script that fetches and decrypts on-chain voting data and outputs a polished Markdown report suitable for export to PDF.
+└── ui/                     # Typescript relayer to submit transactions on behalf of users
 ```
 
 ---
