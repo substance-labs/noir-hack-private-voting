@@ -92,10 +92,7 @@ const Home = () => {
 
         {votes.length === 0 && (
           <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-            <div className="flex flex-col items-center space-y-4">
-              <Spinner />
-              <p className="text-md text-gray-400">Loading data ...</p>
-            </div>
+            <Spinner text="Loading data .." />
           </div>
         )}
 
@@ -190,7 +187,7 @@ const Home = () => {
               className="p-6 text-center"
             >
               {isLoading ? (
-                <p className="text-white">Waiting for proof generation...</p>
+                <Spinner text="Waiting for proof generation ..." />
               ) : (
                 <>
                   <QRCode value={url} size={240} bgColor="transparent" fgColor="white" />
