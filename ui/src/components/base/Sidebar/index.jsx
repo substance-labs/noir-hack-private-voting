@@ -27,7 +27,7 @@ const Sidebar = () => {
       >
         <div className="flex items-center justify-between md:hidden mb-4">
           <div className="flex items-center space-x-3">
-            <div className="text-2xl">🛡️</div>
+            <div className="text-2xl">🪄</div>
             <div className="text-xl font-semibold text-white tracking-tight">Revelio</div>
           </div>
           <button onClick={() => closeSidebar()} className="text-white">
@@ -37,7 +37,7 @@ const Sidebar = () => {
 
         <div className="space-y-8">
           <div className="hidden md:flex items-center space-x-3">
-            <div className="text-2xl">🛡️</div>
+            <div className="text-2xl">🪄</div>
             <div className="text-xl font-semibold text-white tracking-tight">Revelio</div>
           </div>
 

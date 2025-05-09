@@ -26,7 +26,7 @@ export const useVotes = () => {
       const newVotes = await Promise.all(
         Array.from({ length: Number(totalNumberOfVotes) }, (_, voteId) => {
           // NOTE: avoid reading from the contract an already stored vote
-          const storedVote = votes[voteId]
+          const storedVote = votes[votes.length - 1 - voteId]
           if (storedVote) {
             return {
               endBlock: BigInt(storedVote.endBlock),
@@ -47,7 +47,7 @@ export const useVotes = () => {
       const contents = await Promise.all(
         newVotes.map(async ({ ref }, index) => {
           // NOTE: avoid fetching from ipfs an already stored content
-          const storedVote = votes[index]
+          const storedVote = votes[votes.length - 1 - index]
           if (storedVote) {
             return {
               title: storedVote.title,
