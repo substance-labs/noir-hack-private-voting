@@ -1,6 +1,6 @@
 export default {
   addresses: {
-    revelio: "0xFEf4920B61f2dEA204509251D82140AD086166C4",
+    revelio: "0x196cdECf226b87fF0C9a9405A6aF8826D0219aB3",
   },
   apiUrl: process.env.RELAYER_URL,
   ipfsGateway: process.env.IPFS_GATEWAY,
